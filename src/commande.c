@@ -1,6 +1,9 @@
 #include "../include/commande.h"
 
 void cd(char* s,noeud* courant){
+    if(s==NULL){
+        courant=courant->racine;
+    }
     if(s==".."){
         if(courant==courant->racine) return;
         else{
@@ -23,10 +26,8 @@ void cd(char* s,noeud* courant){
     }
 
 }
-void cd(noeud* courant){
-    courant=courant->racine;
-}
-void pwd(noeud* courant){//a finir!
+
+void pwd(noeud* courant){
     assert(courant!=NULL);
     if(courant!=courant->racine){
         pwd(courant->pere);
@@ -44,11 +45,11 @@ void touch(char* s,noeud* courant){
     a->fils=NULL;
     if(courant->est_dossier==true){
         if(courant->fils->no!=NULL){
-                noeud* d=courant->fils->no;
-            while(d->fils->succ->no!=NULL){
-                d=d->fils->succ->no;
+                liste_noeud* d=courant->fils->no;
+            while(d->succ->no!=NULL){
+                d=d->succ->no;
             }
-            d->fils->succ=a;
+            d->succ->no=a;
         }else{
             courant->fils->no=a;
         }
@@ -63,15 +64,18 @@ void mkdir(char* s,noeud* courant){
     a->fils=NULL;
     if(courant->est_dossier==true){
         if(courant->fils->no!=NULL){
-                noeud* d=courant->fils->no;
-            while(d->fils->succ->no!=NULL){
-                d=d->fils->succ->no;
+                liste_noeud* d=courant->fils->no;
+            while(d->succ->no!=NULL){
+                d=d->succ->no;
             }
-            d->fils->succ=a;
+            d->succ->no=a;
         }else{
             courant->fils->no=a;
         }
     }
+}
+void cp(noeud* courant,char* s,char* a){
+
 }
 
 void ls(noeud* courant){
