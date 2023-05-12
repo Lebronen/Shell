@@ -32,7 +32,9 @@ int main(void){
 	rm(courant, "ronen/yohan");
 	courant = cd("ronen", courant);
 	ls(courant);
+	rm_free(racine->fils);
 	free(racine);
+	
 	return 0;
 }
 

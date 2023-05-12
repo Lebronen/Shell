@@ -65,12 +65,18 @@ void touch(char* s,noeud* courant){
     noeud* a;
     liste_noeud *d;
     liste_noeud *c;
+    char *tmp_slash_1;
+    char *tmp_slash_2;
 
     noeud* tmp=courant;
     if (in_str(s, '/'))
-        tmp = cd(slash(s,true),tmp);
+    {
+        tmp_slash_1 = slash(s, true);
+        tmp = cd(tmp_slash_1,tmp);
+    }
     a = new_node(tmp->racine);
-    strcpy(a->nom,slash(s, false));
+    tmp_slash_2 = slash(s, false);
+    strcpy(a->nom,tmp_slash_2);
     a->pere=tmp;
     a->racine=tmp->racine; // noeud globale
     a->fils=NULL;
@@ -89,6 +95,11 @@ void touch(char* s,noeud* courant){
         d->succ = NULL;
         tmp->fils = d;
     }
+    if (in_str(s, '/'))
+    {
+        free(tmp_slash_1);
+        free(tmp_slash_2);
+    }
 }
 void mkdir(char* s,noeud* courant){
     if(!courant->est_dossier){
@@ -98,12 +109,18 @@ void mkdir(char* s,noeud* courant){
     noeud* a;
     liste_noeud *d;
     liste_noeud *c;
+    char *tmp_slash;
+    char *tmp_slash_2;
 
     noeud* tmp=courant;
     if (in_str(s, '/'))
-        tmp = cd(slash(s,true),tmp);
+    {
+        tmp_slash = slash(s, true);
+        tmp = cd(tmp_slash,tmp);
+    }
     a = new_node(tmp->racine);
-    strcpy(a->nom,slash(s, false));
+    tmp_slash_2 = slash(s, false);
+    strcpy(a->nom,tmp_slash_2);
     a->est_dossier = true;
     a->pere=tmp;
     a->racine=tmp->racine; // noeud globale
@@ -123,6 +140,12 @@ void mkdir(char* s,noeud* courant){
         d->succ = NULL;
         tmp->fils = d;
     }
+    if (in_str(s, '/'))
+    {
+        free(tmp_slash);
+    }
+    if (strcmp(s, tmp_slash_2))
+        free(tmp_slash_2);
 }
 
 void ls(noeud* courant){
@@ -147,15 +170,24 @@ void ls(noeud* courant){
 }
 
 noeud *rm(noeud *courant,char* s){
+    char *tmp_slash;
+    char *tmp_slash_2;
     noeud* tmp1=courant;
     if (in_str(s, '/'))
-        tmp1 = cd(slash(s,true),tmp1);
+    {
+        tmp_slash = slash(s, true);
+        tmp1 = cd(tmp_slash,tmp1);
+        free(tmp_slash);
+    }
     liste_noeud* tmp=tmp1->fils;
     liste_noeud* tmp2= NULL;
-    while(tmp && strcmp(slash(s,false),tmp->no->nom)){
+    tmp_slash_2 = slash(s, false);
+    while(tmp && strcmp(tmp_slash_2,tmp->no->nom)){
         tmp2 = tmp;
         tmp = tmp->succ;
     }
+    if (strcmp(tmp_slash_2, s))
+        free(tmp_slash_2);
     if (!tmp)
         return courant;
     if (!tmp2)
@@ -167,6 +199,7 @@ noeud *rm(noeud *courant,char* s){
         tmp2->succ = tmp->succ;
     }
     rm_free(tmp);
+    
     return courant;
 }
 

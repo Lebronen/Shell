@@ -5,7 +5,7 @@ int subslash(char* s){//fonction qui compte le nombre de charactere entre deux /
     while(*s++ && *s!='/'){
         a++;
     }
-    return *s ? a : a - 1;
+    return a;
 }
 
 char* slash(char* s,bool a){// si a=true il renvoie la partie gauche et si a=false il renvoie la partie droite
