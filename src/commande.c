@@ -14,32 +14,28 @@ noeud *cd(char* s,noeud* courant){
                 return courant;
             return cd(s + 3,courant);
         }
-        if(*s=='/'){
-            courant=courant->racine;
-            return cd(s+1,courant);
-        }
-    }else{
+    }
+    if(*s=='/'){
+        courant=courant->racine;
+        return cd(s+1,courant);
+    }
+    else{
         if(courant->fils!=NULL){
             liste_noeud* tmp=courant->fils;
-            while(tmp!=NULL && strncmp(tmp->no->nom,s, subslash(s) - 1)){
-                //printf("%s\n", tmp->no->nom);
+            while(tmp!=NULL && strncmp(tmp->no->nom,s, subslash(s))){
                 tmp=tmp->succ;
             }
-            //printf("fin while\n");
-            //printf("%s %s\n", tmp->no->nom, substr(s,0,subslash(s)));
             if(tmp && tmp->no->est_dossier){
-               // printf("%s\n",tmp->no->nom);
-            
                 courant=tmp->no;
-                if(!s+subslash(s)+1) return courant;
-                printf("return pas\n");
+                if(!*(s+subslash(s)))
+                {
+                    return courant;
+                }
                 return cd(s+subslash(s)+1,courant);
             }else{
-                printf("%s n'existe pas \n",s);
                 return courant;
             }
         }else{
-            printf("le dossier est vide");
             return courant;
         }
     }
@@ -102,10 +98,6 @@ void touch(char* s,noeud* courant){
     }
 }
 void mkdir(char* s,noeud* courant){
-    if(!courant->est_dossier){
-        printf("pas un dossier\n");
-        return ;
-    }
     noeud* a;
     liste_noeud *d;
     liste_noeud *c;
