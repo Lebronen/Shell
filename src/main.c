@@ -22,7 +22,7 @@ int main(void){
 		fclose(fp);
 	}
 	mkdir("ronen", courant);
-	ls(courant);
+	ls("", courant);
 	//courant = cd("ronen", courant);
 	touch("ronen/yohan", courant);
 	touch("ronen/duo_de_fou", courant);
@@ -31,7 +31,7 @@ int main(void){
 	//courant = cd("..", courant);
 	rm(courant, "ronen/yohan");
 	courant = cd("ronen", courant);
-	ls(courant);
+	ls("", courant);
 	rm_free(racine->fils);
 	free(racine);
 	

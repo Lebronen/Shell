@@ -148,7 +148,18 @@ void mkdir(char* s,noeud* courant){
         free(tmp_slash_2);
 }
 
-void ls(noeud* courant){
+void ls(char *s, noeud *courant)
+{
+    noeud *tmp;
+
+    tmp = courant;
+    if (*s)
+        tmp = cd(s,tmp);
+    ls_courant(tmp);
+}
+
+void ls_courant(noeud* courant){
+
     if(courant!=NULL){
         if(courant->fils!=NULL){
              int a=5;
