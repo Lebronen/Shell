@@ -238,7 +238,7 @@ void print(noeud* courant){
 }
 void print_suite(noeud* a){
     if(a==a->racine){
-            printf("%s",a->nom);
+            printf("%s ",a->nom);
         if(a->est_dossier){
             printf(" (d), %d fils:",nbr_fils(a));
             liste_noeud* tmp=a->racine->fils;
@@ -263,18 +263,20 @@ void print_suite(noeud* a){
           printf("%s",a->nom);
 
         if(a->est_dossier){
-            printf(" (d),pére: %s, %d fils:",a->pere->nom,nbr_fils(a));
-            liste_noeud* tmp=a->racine->fils;
+            printf(" (d), pére: %s, %d fils:",a->pere->nom,nbr_fils(a));
+            liste_noeud* tmp=a->fils;
+            //int c=0;
             while(tmp!=NULL){
+                //c++;
                 if(tmp->no->est_dossier){
-                    printf(" %s (d)",tmp->no->nom);
+                    printf(" %s  (d)",tmp->no->nom);
                 }else{
                     printf(" %s (f)",tmp->no->nom);
                 }
                 tmp=tmp->succ;
             }
             printf("\n");
-            tmp=a->racine->fils;
+            tmp=a->fils;
             while(tmp!=NULL){
                 print_suite(tmp->no);
                 tmp=tmp->succ;

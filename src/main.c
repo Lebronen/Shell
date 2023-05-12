@@ -22,12 +22,13 @@ int main(void){
 		fclose(fp);
 	}
 	mkdir("ronen", courant);
-	print(courant);
+	
 	ls("", courant);
 	//courant = cd("ronen", courant);
 	touch("ronen/yohan", courant);
 	touch("ronen/duo_de_fou", courant);
 	touch("ronen/jojo", courant);
+	print(courant);
 	//ls(courant);
 	//courant = cd("..", courant);
 	rm(courant, "ronen/yohan");
