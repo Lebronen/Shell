@@ -37,3 +37,15 @@ bool in_str(char *s, char c)
     }
     return false;
 }
+
+int nbr_fils(noeud* a){
+    int b=0;
+    if(a->fils==NULL) return b;
+    liste_noeud* c=a->fils;
+    b=1;
+    while(c->succ!=NULL){
+        c=c->succ;
+        b++;
+    }
+    return b;
+}

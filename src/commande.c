@@ -232,3 +232,59 @@ void    rm_free(liste_noeud *tmp)
     free(tmp->no);
     free(tmp);
 }
+
+void print(noeud* courant){
+    print_suite(courant->racine);
+}
+void print_suite(noeud* a){
+    if(a==a->racine){
+            printf("%s",a->nom);
+        if(a->est_dossier){
+            printf(" (d), %d fils:",nbr_fils(a));
+            liste_noeud* tmp=a->racine->fils;
+            while(tmp!=NULL){
+                if(tmp->no->est_dossier){
+                    printf(" %s (d)",tmp->no->nom);
+                }else{
+                    printf(" %s (f)",tmp->no->nom);
+                }
+                tmp=tmp->succ;
+            }
+            printf("\n");
+            tmp=a->racine->fils;
+            while(tmp!=NULL){
+                print_suite(tmp->no);
+                tmp=tmp->succ;
+            }
+        }else{
+            printf(" (f), 0 fils \n"); 
+        }
+    }else{
+          printf("%s",a->nom);
+
+        if(a->est_dossier){
+            printf(" (d),pére: %s, %d fils:",a->pere->nom,nbr_fils(a));
+            liste_noeud* tmp=a->racine->fils;
+            while(tmp!=NULL){
+                if(tmp->no->est_dossier){
+                    printf(" %s (d)",tmp->no->nom);
+                }else{
+                    printf(" %s (f)",tmp->no->nom);
+                }
+                tmp=tmp->succ;
+            }
+            printf("\n");
+            tmp=a->racine->fils;
+            while(tmp!=NULL){
+                print_suite(tmp->no);
+                tmp=tmp->succ;
+            }
+        }else{
+            
+            printf(" (f),pére: %s, 0 fils \n",a->pere->nom); 
+        }
+    }
+    
+    
+    
+}

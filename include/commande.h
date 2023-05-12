@@ -37,5 +37,8 @@ char* slash(char* s,bool a);
 noeud *rm(noeud *courant,char* s);
 bool in_str(char *s, char c);
 void    rm_free(liste_noeud *tmp);
+void print(noeud* courant);
+void print_suite(noeud* a);
+int nbr_fils(noeud* a);
 
 #endif
