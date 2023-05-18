@@ -33,6 +33,7 @@ noeud *cd(char* s,noeud* courant){
                 }
                 return cd(s+subslash(s)+1,courant);
             }else{
+                printf("dossier non trouvé\n\n");
                 return courant;
             }
         }else{
@@ -52,92 +53,50 @@ void pwd(noeud* courant){
         printf("%s/",courant->nom);
     }
 }
-void touch(char* s,noeud* courant){
+noeud *touch(char* s,noeud* courant){
 
     if(!courant->est_dossier){
         printf("pas un dossier\n");
-        return ;
+        return NULL;
     }
-    noeud* a;
-    liste_noeud *d;
-    liste_noeud *c;
-    char *tmp_slash_1;
-    char *tmp_slash_2;
+    noeud* nouveau;
+    liste_noeud *liste_fils;
+    liste_noeud *liste_nouveau;
+    char *dossier;
+    char *nom;
 
-    noeud* tmp=courant;
+    noeud* parent=courant;
     if (in_str(s, '/'))
     {
-        tmp_slash_1 = slash(s, true);
-        tmp = cd(tmp_slash_1,tmp);
+        dossier = slash(s, true);
+        parent = cd(dossier, parent);
+        free(dossier);
     }
-    a = new_node(tmp->racine);
-    tmp_slash_2 = slash(s, false);
-    strcpy(a->nom,tmp_slash_2);
-    a->pere=tmp;
-    a->racine=tmp->racine; // noeud globale
-    a->fils=NULL;
-    if(tmp->fils!=NULL){
-        d=tmp->fils;
-        while(d->succ!=NULL){
-            d=d->succ;
+    nouveau = new_node(parent->racine);
+    nom = slash(s, false);
+    strcpy(nouveau->nom, nom);
+    free(nom);
+    nouveau->pere = parent;
+    liste_nouveau = malloc(sizeof(liste_noeud));
+    liste_nouveau->no = nouveau;
+    liste_nouveau->succ = NULL;
+    if(parent->fils != NULL){
+        liste_fils = parent->fils;
+        while(liste_fils->succ != NULL){
+            liste_fils = liste_fils->succ;
         }
-        c = malloc(sizeof(liste_noeud));
-        c->no = a;
-        c->succ = NULL;
-        d->succ = c;
+        liste_fils->succ = liste_nouveau;
     }else{
-        d = malloc(sizeof(liste_noeud));
-        d->no = a;
-        d->succ = NULL;
-        tmp->fils = d;
+        parent->fils = liste_nouveau;
     }
-    if (in_str(s, '/'))
-    {
-        free(tmp_slash_1);
-        free(tmp_slash_2);
-    }
+
+    return nouveau;
 }
-void mkdir(char* s,noeud* courant){
-    noeud* a;
-    liste_noeud *d;
-    liste_noeud *c;
-    char *tmp_slash;
-    char *tmp_slash_2;
-
-    noeud* tmp=courant;
-    if (in_str(s, '/'))
-    {
-        tmp_slash = slash(s, true);
-        tmp = cd(tmp_slash,tmp);
-    }
-    a = new_node(tmp->racine);
-    tmp_slash_2 = slash(s, false);
-    strcpy(a->nom,tmp_slash_2);
-    a->est_dossier = true;
-    a->pere=tmp;
-    a->racine=tmp->racine; // noeud globale
-    a->fils=NULL;
-    if(tmp->fils!=NULL){
-        d=tmp->fils;
-        while(d->succ!=NULL){
-            d=d->succ;
-        }
-        c = malloc(sizeof(liste_noeud));
-        c->no = a;
-        c->succ = NULL;
-        d->succ = c;
-    }else{
-        d = malloc(sizeof(liste_noeud));
-        d->no = a;
-        d->succ = NULL;
-        tmp->fils = d;
-    }
-    if (in_str(s, '/'))
-    {
-        free(tmp_slash);
-    }
-    if (strcmp(s, tmp_slash_2))
-        free(tmp_slash_2);
+noeud *mkdir(char* s,noeud* courant){
+   noeud *dossier = touch(s, courant);
+   dossier->est_dossier = true;
+    
+    return dossier;
 }
 
 void ls(char *s, noeud *courant)
@@ -153,29 +112,35 @@ void ls(char *s, noeud *courant)
 void ls_courant(noeud* courant){
 
     if(courant!=NULL){
-        if(courant->fils!=NULL){
-             int a=5;
-            liste_noeud* b=courant->fils;
-            while(b!=NULL){
-                
-                printf("   %s",b->no->nom);
-                if(a){
-                     a--;
-                }else{
-                    a=5;
-                }
-               b=b->succ;
-
+        int a=5;
+        liste_noeud* b=courant->fils;
+        while(b!=NULL){
+            
+            printf("   %s",b->no->nom);
+            if(a){
+                    a--;
+            }else{
+                a=5;
+                printf("\n");
             }
-            printf("\n");
-        }  
+            b=b->succ;
+
+        }
+        printf("\n");
     }
 }
 
-noeud *rm(noeud *courant,char* s){
-    char *tmp_slash;
+noeud *rm(noeud *courant,char *s){
     char *tmp_slash_2;
+    char *tmp_slash;
     noeud* tmp1=courant;
+    tmp_slash_2 = slash(s, false);
+    if (in_path(courant, tmp_slash_2))
+    {
+        printf("impossible de supprimer un dossier dans lequel vous êtes actuellement\n");
+        free(tmp_slash_2);
+        return courant;
+    }
     if (in_str(s, '/'))
     {
         tmp_slash = slash(s, true);
@@ -184,13 +149,11 @@ noeud *rm(noeud *courant,char* s){
     }
     liste_noeud* tmp=tmp1->fils;
     liste_noeud* tmp2= NULL;
-    tmp_slash_2 = slash(s, false);
     while(tmp && strcmp(tmp_slash_2,tmp->no->nom)){
         tmp2 = tmp;
         tmp = tmp->succ;
     }
-    if (strcmp(tmp_slash_2, s))
-        free(tmp_slash_2);
+    free(tmp_slash_2);
     if (!tmp)
         return courant;
     if (!tmp2)
@@ -209,17 +172,14 @@ noeud *rm(noeud *courant,char* s){
 
 void    rm_free(liste_noeud *tmp)
 {
-    
-    if (tmp->no->est_dossier)
+       
+    liste_noeud *fils = tmp->no->fils;
+    liste_noeud *suc;
+    while (fils)
     {
-        liste_noeud *fils = tmp->no->fils;
-        liste_noeud *suc;
-        while (fils)
-        {
-            suc = fils->succ;
-            rm_free(fils);
-            fils = suc;
-        }
+        suc = fils->succ;
+        rm_free(fils);
+        fils = suc;
     }
     free(tmp->no);
     free(tmp);
@@ -229,8 +189,9 @@ void print(noeud* courant){
     print_suite(courant->racine);
 }
 void print_suite(noeud* a){
+    printf("Noeud ");
     if(a==a->racine){
-            printf("%s ",a->nom);
+            printf("/");
         if(a->est_dossier){
             printf(" (d), %d fils:",nbr_fils(a));
             liste_noeud* tmp=a->racine->fils;
@@ -255,7 +216,7 @@ void print_suite(noeud* a){
           printf("%s",a->nom);
 
         if(a->est_dossier){
-            printf(" (d), pére: %s, %d fils:",a->pere->nom,nbr_fils(a));
+            printf(" (d), pére: %s, %d fils:",*(a->pere->nom) ? a->pere->nom : "/",nbr_fils(a));
             liste_noeud* tmp=a->fils;
             //int c=0;
             while(tmp!=NULL){
@@ -278,7 +239,93 @@ void print_suite(noeud* a){
             printf(" (f),pére: %s, 0 fils \n",a->pere->nom); 
         }
     }
-    
-    
-    
+}
+
+void cp(noeud *courant, char *s)
+{
+    liste_noeud *tmp;
+    char *tmp_slash;
+    char *tmp_slash2;
+    liste_noeud *tmp_2 = NULL;
+    char *nom;
+    char *nom_2;
+    int i;
+
+    noeud *tmp_src = courant;
+    noeud *tmp_dest = courant;
+    i = argument(s);
+    if(!s[i])
+    {
+        printf("argument manquant\n\n");
+        return ;
+    }
+    char *dest = s + i + 1;
+    s[i] = '\0';
+    char *src = s;
+    if (!src || !dest)
+        return ;
+    if (in_str(src, '/'))
+    {
+        tmp_slash = slash(src, true);
+        tmp_src = cd(tmp_slash, courant);
+        free(tmp_slash);
+    }
+    if (*dest)
+    {
+        tmp_slash2 = slash(dest, true);
+        tmp_dest = cd(tmp_slash2, courant);
+        tmp_2 = tmp_dest->fils;
+        nom_2 = slash(dest, false);
+        while (tmp_2 && strcmp(tmp_2->no->nom, nom_2))
+        {
+            tmp_2 = tmp_2->succ;
+        }
+        if (tmp_2)
+            tmp_dest = cd(nom_2, tmp_dest);
+            free(tmp_slash2);
+    }
+    tmp = tmp_src->fils;
+    nom = slash(src, false);
+    while (tmp && strcmp(tmp->no->nom, nom))
+    {
+        tmp = tmp->succ;
+    }
+    if (!tmp || strstr(dest, src) || in_path(tmp_dest, nom))
+    {
+        free(nom);
+        free(nom_2);
+        printf("fichier ou dossier introuvable\n\n");
+        return ;
+    }
+    if (tmp_2)
+        cp_bis(tmp->no, tmp_dest, tmp->no->nom);
+    else
+        cp_bis(tmp->no, tmp_dest, nom_2);
+    free(nom_2);
+    free(nom);
+}
+
+void cp_bis(noeud *tmp, noeud *tmp_dest, char *nom)
+{
+    if (!tmp->est_dossier)
+    {
+
+        touch(nom, tmp_dest);
+    }
+    else
+    {
+        noeud *dest =  mkdir(nom, tmp_dest);
+        liste_noeud * fils = tmp->fils;
+        while (fils)
+        {
+            cp_bis(fils->no, dest, fils->no->nom);
+            fils = fils->succ;
+        }
+    }
+}
+
+void mv(noeud *courant, char *s)
+{
+    cp(courant, s);
+    rm(courant, s);
 }

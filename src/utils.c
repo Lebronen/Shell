@@ -2,7 +2,7 @@
 
 int subslash(char* s){//fonction qui compte le nombre de charactere entre deux / ou 1 slash et la fin
     int a=0;
-    while(*s++ && *s!='/'){
+    while(s[a] && s[a]!='/'){
         a++;
     }
     return a;
@@ -14,8 +14,8 @@ char* slash(char* s,bool a){// si a=true il renvoie la partie gauche et si a=fal
     while(s[i]!='/' && i){
         i--;
     }
-    if(!i){
-        return s;
+    if(s[i] != '/'){
+        return strdup(s);
     }
     t=malloc(a ? i + 1 : strlen(s) - i);
     if(a){
@@ -30,22 +30,42 @@ char* slash(char* s,bool a){// si a=true il renvoie la partie gauche et si a=fal
 
 bool in_str(char *s, char c)
 {
-    while (*s++)
+    while (*s)
     {
         if (*s == c)
             return true;
+        s++;
     }
     return false;
 }
 
 int nbr_fils(noeud* a){
-    int b=0;
-    if(a->fils==NULL) return b;
     liste_noeud* c=a->fils;
-    b=1;
-    while(c->succ!=NULL){
+    if(c==NULL) return 0;
+    int b=1;
+    while(c->succ){
         c=c->succ;
         b++;
     }
     return b;
+}
+
+int argument(char *s)
+{
+    int i = 0;
+    char *arg;
+    while (s[i] && s[i] != ' '){
+        i++;
+    }
+    return i;
+}
+
+bool in_path(noeud *courant, char *s)
+{
+    if (courant == courant->racine)
+        return false;
+    if (!strcmp(courant->nom, s))
+        return true;
+    return in_path(courant->pere, s);
+    
 }
