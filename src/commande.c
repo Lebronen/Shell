@@ -3,7 +3,7 @@
 noeud *cd(char* s,noeud* courant){ // déplace le noeud courant dans le dossier donné en argument
     char *sub;
 
-    // si aucun argumetn n'est donné, on retourne à la racine
+    // si aucun argument n'est donné, on retourne à la racine
     if(!*s){
         courant=courant->racine;
         return courant;
@@ -49,23 +49,23 @@ noeud *cd(char* s,noeud* courant){ // déplace le noeud courant dans le dossier 
 
 }
 
-void pwd(noeud* courant){
-    if (!courant)
+void pwd(noeud* courant){//fonction affichant le chemin absolue de la racine jusqu'au noeud courant.
+    if (!courant)//si le noeud courant est NULL la fonction fait rien
         return ;
-    if(courant!=courant->racine){
+    if(courant!=courant->racine){//si le noeud courant n'est pas la racine on fait un appel récursif puis onaffiche le nom du noeud courantsuivie de "/s"
         pwd(courant->pere);
         printf("%s/",courant->nom);
-    }else{
+    }else{// si le noeud courant est la racine on affiche juste le nom.
         printf("%s/",courant->nom);
     }
 }
 noeud *touch(char* s,noeud* courant){ // fonction créant un ficher dans le dossier donné en argument
 
-    if(!courant->est_dossier){
+    if(!courant->est_dossier){//si le noeud n'est pas un dossier on affiche un messade d'erreur et on ne fait rien
         printf("pas un dossier\n");
         return NULL;
     }
-    noeud* nouveau;
+    noeud* nouveau;//on créer un nouveau noeud et on initialise ces objets
     liste_noeud *liste_fils;
     liste_noeud *liste_nouveau;
     char *dossier;
@@ -79,20 +79,20 @@ noeud *touch(char* s,noeud* courant){ // fonction créant un ficher dans le doss
         free(dossier);
     }
     nouveau = new_node(parent->racine);
-    nom = slash(s, false);
+    nom = slash(s, false);//on s'assure que le nom soit le dernier string aprés un "/" si c'est un string chemin absolue ou chemincontenant plusieur dossier
     strcpy(nouveau->nom, nom);
     free(nom);
     nouveau->pere = parent;
     liste_nouveau = malloc(sizeof(liste_noeud));
     liste_nouveau->no = nouveau;
     liste_nouveau->succ = NULL;
-    if(parent->fils != NULL){
+    if(parent->fils != NULL){//si le courant (le pére du nouveau fichier) a des fils, on parcourt tous ces fils pour ensuite rajouter le nouveau fils.
         liste_fils = parent->fils;
         while(liste_fils->succ != NULL){
             liste_fils = liste_fils->succ;
         }
         liste_fils->succ = liste_nouveau;
-    }else{
+    }else{//dans le cas contraire on met juste directement le nouveau fichier comme fils de courant
         parent->fils = liste_nouveau;
     }
 
@@ -195,17 +195,17 @@ void    rm_free(liste_noeud *tmp)
     free(tmp);
 }
 
-void print(noeud* courant){
+void print(noeud* courant){//on rapelle la fonction a la racine
     print_suite(courant->racine);
 }
-void print_suite(noeud* a){
+void print_suite(noeud* a){//fonction qui affiche tous l'arborescence
     printf("Noeud ");
-    if(a==a->racine){
+    if(a==a->racine){//si le noeud est la racine on ne met pas de nom aprés le noeud
             printf("/");
-        if(a->est_dossier){
+        if(a->est_dossier){// si a est un dossier on affiche (d) et son nombre de fils
             printf(" (d), %d fils:",nbr_fils(a));
             liste_noeud* tmp=a->racine->fils;
-            while(tmp!=NULL){
+            while(tmp!=NULL){//on parcours tous les fils du dossier et on affiche si c'est un fichier (avec (f)) ou si c'est un dossier (avec (d))
                 if(tmp->no->est_dossier){
                     printf(" %s (d)",tmp->no->nom);
                 }else{
@@ -215,21 +215,21 @@ void print_suite(noeud* a){
             }
             printf("\n");
             tmp=a->racine->fils;
-            while(tmp!=NULL){
+            while(tmp!=NULL){//ensuite on rapelle la fonction avec tous ces fils 
                 print_suite(tmp->no);
                 tmp=tmp->succ;
             }
-        }else{
+        }else{// si a n'est pas un dossier onrenvoie que c'est un fichier et qu'il a 0 fils
             printf(" (f), 0 fils \n"); 
         }
-    }else{
+    }else{// quand ce a n'est pas la racine 
           printf("%s",a->nom);
 
-        if(a->est_dossier){
+        if(a->est_dossier){// quand a est un dossier on a l'affichage avec (d) son pére et son fils 
             printf(" (d), pére: %s, %d fils:",*(a->pere->nom) ? a->pere->nom : "/",nbr_fils(a));
             liste_noeud* tmp=a->fils;
             //int c=0;
-            while(tmp!=NULL){
+            while(tmp!=NULL){//on parcours ensuite ces fils en affichant leur om en fonction de si c'est un fichier ou un dossier
                 //c++;
                 if(tmp->no->est_dossier){
                     printf(" %s  (d)",tmp->no->nom);
@@ -240,11 +240,11 @@ void print_suite(noeud* a){
             }
             printf("\n");
             tmp=a->fils;
-            while(tmp!=NULL){
+            while(tmp!=NULL){//on rapelle la fonction récursivement sur ces fils aussi
                 print_suite(tmp->no);
                 tmp=tmp->succ;
             }
-        }else{
+        }else{//quand a n'est qu'un fichier onrenvoie juste l'affichage  dans le cas d'un fichier et on saute la ligne.
             
             printf(" (f),pére: %s, 0 fils \n",a->pere->nom); 
         }
