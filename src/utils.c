@@ -8,7 +8,7 @@ int subslash(char* s){//fonction qui compte le nombre de charactere entre deux /
     return a;
 }
 
-char* slash(char* s,bool a){// si a=true il renvoie la partie gauche et si a=false il renvoie la partie droite
+char* slash(char* s,bool a){// si a=true il renvoie la partie gauche du chemin et si a=false il renvoie la partie droite
     int i=strlen(s)-1;
     char* t;
     while(s[i]!='/' && i){
@@ -29,7 +29,7 @@ char* slash(char* s,bool a){// si a=true il renvoie la partie gauche et si a=fal
 }
 
 bool in_str(char *s, char c)
-{
+{ // vérifie si un caractère est dans une chaine
     while (*s)
     {
         if (*s == c)
@@ -51,7 +51,7 @@ int nbr_fils(noeud* a){
 }
 
 int argument(char *s)
-{
+{ // renvoie la position de l'éventuel caractère espace dans une chaine afin de trouver les deux arguments pour cp et mv
     int i = 0;
     char *arg;
     while (s[i] && s[i] != ' '){
@@ -61,7 +61,7 @@ int argument(char *s)
 }
 
 bool in_path(noeud *courant, char *s)
-{
+{ // vérifie si le fichier se trouve dans le chemin du noeud courant
     if (courant == courant->racine)
         return false;
     if (!strcmp(courant->nom, s))

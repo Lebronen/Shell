@@ -1,11 +1,14 @@
 #include "../include/commande.h"
 
-noeud *cd(char* s,noeud* courant){
+noeud *cd(char* s,noeud* courant){ // déplace le noeud courant dans le dossier donné en argument
     char *sub;
+
+    // si aucun argumetn n'est donné, on retourne à la racine
     if(!*s){
         courant=courant->racine;
         return courant;
     }
+    //si le chemin du dossier commence par .., on reviens en arrière dans l'arborescence puis on appelle cd sur le reste du chemin
     if(!strncmp("..",s, 2)){
         if(courant==courant->racine) return courant;
         else{
@@ -15,6 +18,7 @@ noeud *cd(char* s,noeud* courant){
             return cd(s + 3,courant);
         }
     }
+    //si le chemin commence par /, c'est un chemin absolu. On le fait donccommencer à la racine
     if(*s=='/'){
         courant=courant->racine;
         return cd(s+1,courant);
@@ -22,9 +26,11 @@ noeud *cd(char* s,noeud* courant){
     else{
         if(courant->fils!=NULL){
             liste_noeud* tmp=courant->fils;
+            //on cherche le dossier dans l'arobrescence
             while(tmp!=NULL && strncmp(tmp->no->nom,s, subslash(s))){
                 tmp=tmp->succ;
             }
+            //s'il existe et est un dossier, on y déplace le noeud courant
             if(tmp && tmp->no->est_dossier){
                 courant=tmp->no;
                 if(!*(s+subslash(s)))
@@ -32,7 +38,7 @@ noeud *cd(char* s,noeud* courant){
                     return courant;
                 }
                 return cd(s+subslash(s)+1,courant);
-            }else{
+            }else{ // s'il n'existe pas ou n'est pas un dossier on quitte la fonction
                 printf("dossier non trouvé\n\n");
                 return courant;
             }
@@ -53,7 +59,7 @@ void pwd(noeud* courant){
         printf("%s/",courant->nom);
     }
 }
-noeud *touch(char* s,noeud* courant){
+noeud *touch(char* s,noeud* courant){ // fonction créant un ficher dans le dossier donné en argument
 
     if(!courant->est_dossier){
         printf("pas un dossier\n");
@@ -67,7 +73,7 @@ noeud *touch(char* s,noeud* courant){
 
     noeud* parent=courant;
     if (in_str(s, '/'))
-    {
+    { //si l'argument est chemin contenant plusieurs dossiers, on y déplace d'abord le noeud courant
         dossier = slash(s, true);
         parent = cd(dossier, parent);
         free(dossier);
@@ -92,15 +98,16 @@ noeud *touch(char* s,noeud* courant){
 
     return nouveau;
 }
-noeud *mkdir(char* s,noeud* courant){
+noeud *mkdir(char* s,noeud* courant){ //fonction créant un dossier dans le dossier donné en argument
    noeud *dossier = touch(s, courant);
-   dossier->est_dossier = true;
+   dossier->est_dossier = true; // vu qu'on crée un dossier, on met le booléen est_dossier à true
     
     return dossier;
 }
 
 void ls(char *s, noeud *courant)
 {
+    //si l'argument est chemin contenant plusieurs dossiers, on y déplace d'abord le noeud courant
     noeud *tmp;
 
     tmp = courant;
@@ -109,10 +116,10 @@ void ls(char *s, noeud *courant)
     ls_courant(tmp);
 }
 
-void ls_courant(noeud* courant){
+void ls_courant(noeud* courant){ // commande affichant le contenu d'un dossier
 
     if(courant!=NULL){
-        int a=5;
+        int a=5; // on n'affiche que cinq éléments par ligne pour rendre l'affichage plus lisible
         liste_noeud* b=courant->fils;
         while(b!=NULL){
             
@@ -130,25 +137,27 @@ void ls_courant(noeud* courant){
     }
 }
 
-noeud *rm(noeud *courant,char *s){
+noeud *rm(noeud *courant,char *s){ // fonction supprimant l'élément donné
     char *tmp_slash_2;
     char *tmp_slash;
     noeud* tmp1=courant;
     tmp_slash_2 = slash(s, false);
-    if (in_path(courant, tmp_slash_2))
+    if (in_path(courant, tmp_slash_2)) // si la commande tente de supprimer un dossier dans le quel se trouve le noeud courant, on
+    // quitte la fonction
     {
         printf("impossible de supprimer un dossier dans lequel vous êtes actuellement\n");
         free(tmp_slash_2);
         return courant;
     }
     if (in_str(s, '/'))
-    {
+    {  //si l'argument est chemin contenant plusieurs dossiers, on y déplace d'abord le noeud courant
         tmp_slash = slash(s, true);
         tmp1 = cd(tmp_slash,tmp1);
         free(tmp_slash);
     }
     liste_noeud* tmp=tmp1->fils;
     liste_noeud* tmp2= NULL;
+    //on cherche l'élément à supprimer dans l'arborescence
     while(tmp && strcmp(tmp_slash_2,tmp->no->nom)){
         tmp2 = tmp;
         tmp = tmp->succ;
@@ -156,6 +165,7 @@ noeud *rm(noeud *courant,char *s){
     free(tmp_slash_2);
     if (!tmp)
         return courant;
+    //avant de supprimer définitivement l'élément, on refait les liens entre ses noeuds voisins
     if (!tmp2)
     {
         tmp1->fils = tmp->succ;
@@ -171,7 +181,7 @@ noeud *rm(noeud *courant,char *s){
 
 
 void    rm_free(liste_noeud *tmp)
-{
+{ // suppression du noeud et libération de son emplacement mémoire
        
     liste_noeud *fils = tmp->no->fils;
     liste_noeud *suc;
@@ -242,7 +252,7 @@ void print_suite(noeud* a){
 }
 
 void cp(noeud *courant, char *s)
-{
+{ // fonction copiant un noeud
     liste_noeud *tmp;
     char *tmp_slash;
     char *tmp_slash2;
@@ -259,6 +269,7 @@ void cp(noeud *courant, char *s)
         printf("argument manquant\n\n");
         return ;
     }
+    // parsing de la chaine de caractère
     char *dest = s + i + 1;
     s[i] = '\0';
     char *src = s;
@@ -281,7 +292,8 @@ void cp(noeud *courant, char *s)
             tmp_2 = tmp_2->succ;
         }
         if (tmp_2)
-            tmp_dest = cd(nom_2, tmp_dest);
+            tmp_dest = cd(nom_2, tmp_dest); // si la destination esxiste, on y déplace tmp_dest, sinon on créera une copie
+            // de la source en la renommant comme la destination
             free(tmp_slash2);
     }
     tmp = tmp_src->fils;
@@ -290,7 +302,8 @@ void cp(noeud *courant, char *s)
     {
         tmp = tmp->succ;
     }
-    if (!tmp || strstr(dest, src) || in_path(tmp_dest, nom))
+    if (!tmp || strstr(dest, src) || in_path(tmp_dest, nom)) //si la commande tente de copier un élément dans un dossier
+    //qu'il contient, on quitte la fonction
     {
         free(nom);
         free(nom_2);
@@ -306,14 +319,14 @@ void cp(noeud *courant, char *s)
 }
 
 void cp_bis(noeud *tmp, noeud *tmp_dest, char *nom)
-{
+{ 
     if (!tmp->est_dossier)
     {
 
-        touch(nom, tmp_dest);
+        touch(nom, tmp_dest); // si le noeud est un fichier, on le crée simplement avec touch
     }
     else
-    {
+    { // si c'est un dossier, on le crée avec mkdir puis on appelle récursivement la fonction sur ses enfants
         noeud *dest =  mkdir(nom, tmp_dest);
         liste_noeud * fils = tmp->fils;
         while (fils)
@@ -325,7 +338,8 @@ void cp_bis(noeud *tmp, noeud *tmp_dest, char *nom)
 }
 
 void mv(noeud *courant, char *s)
-{
+{ // fonction déplacaant un élément
+// on copie d'abord l'élément au bon endriot, puis on le supprime de son acien emplacement
     cp(courant, s);
     rm(courant, s);
 }

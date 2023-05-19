@@ -2,8 +2,15 @@
 
 #include <stdio.h>
 
-int main(void){
-	
+int main(int argc, char **argv){
+
+	//si aucun fichier n'est donné en argument, le programme quitte directement
+	if (argc <= 1) {
+	printf("veuillez donner un fichier d'instructions en paramètre\n");
+	return 0;
+	}
+
+	//initialisation de la racine et du noeud courant
 	noeud *courant;
 	noeud *racine;
 	racine = new_node(NULL);
@@ -11,11 +18,20 @@ int main(void){
 	racine->nom[0] = 0;
 	racine->racine = racine;
 	courant = racine;
-	FILE* fp = fopen("test-err2.txt", "r");
+
+	//ouverture du fichier
+	FILE* fp = fopen(argv[1], "r");
+	// si le fichier n'est pas trouvé, le programme quitte
+	if (fp < 0) {
+	printf("fichier non trouvé");
+	return 0;
+	}
+	//lecture du fichier ligne par ligne
 	if(fp != NULL){
 		char buffer[1024];
 		while(!feof(fp)){
 			if(fgets(buffer, sizeof(buffer) - 1, fp) != NULL){
+				//analyse et éxécution des commandes donnés par le fichier
 				courant = commande(buffer, racine, courant);
 			}
 		}
@@ -48,8 +64,10 @@ noeud	*new_node(noeud *racine)
 	return n;
 }
 
-noeud *commande(char *s, noeud *racine, noeud *courant)
+noeud *commande(char *s, noeud *racine, noeud *courant) 
 {
+	//l'instruction est comparé aux instructions existantes puis, éxécutés si elles sont reconnues
+	
 	if (in_str(s, '\n'))
 		s[strlen(s) - 1] = 0;
 	//printf("%s\n", s);
