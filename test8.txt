@@ -1,7 +1,0 @@
-mkdir ronen
-mkdir yohan
-cd ronen
-touch jojo
-mkdir best_duo
-cd ..
-cd best_duo
